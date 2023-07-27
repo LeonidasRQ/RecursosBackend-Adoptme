@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
+import handlebars from "express-handlebars";
 
 import __dirname from "./dirname.js";
 import usersRouter from "./routes/users.router.js";
@@ -12,6 +13,11 @@ import { mongoConnect } from "./mongo.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+app.engine("handlebars", handlebars.engine());
+app.set("view engine", "handlebars");
+app.set("views", `${__dirname}/views`);
+
 mongoConnect();
 
 const swaggerOptions = {
@@ -31,6 +37,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
+app.get("/", (req, res) => res.render("home"));
 app.use("/api/users", usersRouter);
 app.use("/api/pets", petsRouter);
 app.use("/api/adoptions", adoptionsRouter);
